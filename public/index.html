@@ -2,16 +2,146 @@
 <html>
 	<head>
 		<title>Remote Lab</title>
-		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/bootstrap.min.css">
+		<link rel="stylesheet" href="bootstrap-theme.min.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+		<style>
+			form { margin: 3px 3px 20px 3px; }
+			.input-group { margin: 2px 0px 2px 0px; }
+		</style>
 	</head>
-	<body>
+	<body><div style="width: 180px;">
+		<form>
+			<label>Lokaloszillator 1</label>
+			<div class="input-group">
+				<div class="input-group-addon" style="width:65px;">Freq</div>
+				<input type="text" class="form-control" id="lo1Freq">
+				<div class="input-group-addon">MHz</div>
+			</div>
+			<div class="input-group">
+				<div class="input-group-addon" style="width:65px;">Power</div>
+				<input type="text" class="form-control" id="lo1Power">
+				<div class="input-group-addon">dBm</div>
+			</div>
+			<div class="input-group" style="margin-left: 20px;">
+				<div class="checkbox">	
+					<input type="checkbox" id="lo1State"> RF ON
+				</div>
+			</div>
+		</form>
+
+		<form>
+			<label>Lokaloszillator 2</label>
+			<div class="input-group">
+				<div class="input-group-addon" style="width:65px;">Freq</div>
+				<input type="text" class="form-control" id="lo2Freq">
+				<div class="input-group-addon">MHz</div>
+			</div>
+			<div class="input-group">
+				<div class="input-group-addon" style="width:65px;">Power</div>
+				<input type="text" class="form-control" id="lo2Power">
+				<div class="input-group-addon">dBm</div>
+			</div>
+			<div class="input-group" style="margin-left: 20px;">
+				<div class="checkbox">	
+					<input type="checkbox" id="lo2State"> RF ON
+				</div>
+			</div>
+		</form>
+
+		<form>
+			<label>Dämpfungsglied</label>
+			<div class="input-group">
+				<div class="input-group-addon" style="width:65px;">Atn</div>
+				<input type="text" class="form-control" id="datAtn">
+				<div class="input-group-addon">dB</div>
+			</div>
+		</form></div>
 
 		<script src="/socket.io/socket.io.js"></script>
 		<script>
+
+			$('#lo1Freq').keypress( ( e ) => {
+				if( e.which == 13 ) {
+					socket.emit( 'lo1.freq', parseInt( $('#lo1Freq').val() ) * 1000000 );
+					$('#lo1Freq').prop( 'disabled', true );
+					return false;
+				}
+			} ).blur( () => {
+				socket.emit( 'lo1.freq', parseInt( $('#lo1Freq').val() ) * 1000000 );
+				$('#lo1Freq').prop( 'disabled', true );
+			} );
+			$('#lo1Power').keypress( ( e ) => {
+				if( e.which == 13 ) {
+					socket.emit( 'lo1.power', parseInt( $('#lo1Power').val() ) );
+					$('#lo1Power').prop( 'disabled', true );
+					return false;
+				}
+			} ).blur( () => {
+				socket.emit( 'lo1.power', parseInt( $('#lo1Power').val() ) );
+				$('#lo1Power').prop( 'disabled', true );
+			} );
+			$('#lo1State').change( () => {
+				socket.emit( 'lo1.state', $('#lo1State')[0].checked );
+			} );
+
+			$('#lo2Freq').keypress( ( e ) => {
+				if( e.which == 13 ) {
+					socket.emit( 'lo2.freq', parseInt( $('#lo2Freq').val() ) * 1000000 );
+					$('#lo2Freq').prop( 'disabled', true );
+					return false;
+				}
+			} ).blur( () => {
+				socket.emit( 'lo2.freq', parseInt( $('#lo2Freq').val() ) * 1000000 );
+				$('#lo2Freq').prop( 'disabled', true );
+			} );
+			$('#lo2Power').keypress( ( e ) => {
+				if( e.which == 13 ) {
+					socket.emit( 'lo2.power', parseInt( $('#lo2Power').val() ) );
+					$('#lo2Power').prop( 'disabled', true );
+					return false;
+				}
+			} ).blur( () => {
+				socket.emit( 'lo2.power', parseInt( $('#lo2Power').val() ) );
+				$('#lo2Power').prop( 'disabled', true );
+			} );
+			$('#lo2State').change( () => {
+				socket.emit( 'lo2.state', $('#lo2State')[0].checked );
+			} );
+
+			$('#datAtn').keypress( ( e ) => {
+				if( e.which == 13 ) {
+					socket.emit( 'dat.atn', parseFloat( $('#datAtn').val() ) );
+					$('#datAtn').prop( 'disabled', true );
+					return false;
+				}
+			} ).blur( () => {
+				socket.emit( 'dat.atn', parseFloat( $('#datAtn').val() ) );
+				$('#datAtn').prop( 'disabled', true );
+			} );
+
 			var socket = io.connect();
-			socket.on('news', function (data) {
-				console.log(data);
-				socket.emit('my other event', { my: 'data' });
+			socket.on( 'lo1.freq', ( freq ) => {
+				$('#lo1Freq').val( freq / 1000000 ).prop( 'disabled', false );
+			});
+			socket.on( 'lo1.power', ( power ) => {
+				$('#lo1Power').val( power ).prop( 'disabled', false );
+			});
+			socket.on( 'lo1.state', ( state ) => {
+				$('#lo1State').prop( 'checked', state ).prop( 'disabled', false );
+			});
+			socket.on( 'lo2.freq', ( freq ) => {
+				$('#lo2Freq').val( freq / 1000000 ).prop( 'disabled', false );
+			});
+			socket.on( 'lo2.power', ( power ) => {
+				$('#lo2Power').val( power ).prop( 'disabled', false );
+			});
+			socket.on( 'lo2.state', ( state ) => {
+				$('#lo2State').prop( 'checked', state ).prop( 'disabled', false );
+			});
+			socket.on( 'dat.atn', ( atn ) => {
+				$('#datAtn').val( atn ).prop( 'disabled', false );
 			});
 		</script>
 	</body>
