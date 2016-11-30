@@ -23,7 +23,7 @@ function timeout( delay ) { return new Promise( ( resolve ) => {
 	setTimeout( () => resolve(), delay );
 } ); }
 
-let curAtn;
+let curAtn = 0;
 
 function setAtn( atn ) {
 

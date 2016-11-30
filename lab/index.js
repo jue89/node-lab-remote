@@ -1,8 +1,8 @@
 const LO = require( './lib/lo.js' );
 const dat = require( './lib/dat.js' );
 
-const lo1 = LO.connect( 27 );
-const lo2 = LO.connect( 28 );
+const lo1 = LO.connect( 28 );
+const lo2 = LO.connect( 27 );
 
 module.exports = function( io ) {
 
@@ -12,15 +12,11 @@ module.exports = function( io ) {
 	let curLO1Power;
 	let curLO1State;
 
-	lo1.getFreq().then( ( freq ) => {
-		curLO1Freq = freq;
-		return lo1.getPower();
-	} ).then( ( power ) => {
-		curLO1Power = power;
-		return lo1.getState();
-	} ).then( ( state ) => {
-		curLO1State = state;
-	} );
+	Promise.all( [ lo1.getFreq(), lo1.getPower(), lo1.getState() ] ).then( ( result ) => {
+		curLO1Freq = result[0];
+		curLO1Power = result[1];
+		curLO1State = result[2];
+	} ); 
 
 	function setLO1Freq( freq ) {
 		lo1.setFreq( parseInt( freq ) ).then( ( freq ) => {
@@ -31,15 +27,15 @@ module.exports = function( io ) {
 
 	function setLO1Power( power ) {
 		lo1.setPower( parseInt( power ) ).then( ( power ) => {
-			curLO1Freq = power;
+			curLO1Power = power;
 			io.emit( 'lo1.power', power );
 		} );
 	}
 
-	function setLO1Power( power ) {
-		lo1.setPower( parseInt( power ) ).then( ( power ) => {
-			curLO1Freq = power;
-			io.emit( 'lo1.power', power );
+	function setLO1State( state ) {
+		lo1.setState( state ).then( ( state ) => {
+			curLO1State = state;
+			io.emit( 'lo1.state', state );
 		} );
 	}
 
@@ -51,15 +47,11 @@ module.exports = function( io ) {
 	let curLO2Power;
 	let curLO2State;
 
-	lo2.getFreq().then( ( freq ) => {
-		curLO2Freq = freq;
-		return lo2.getPower();
-	} ).then( ( power ) => {
-		curLO2Power = power;
-		return lo2.getState();
-	} ).then( ( state ) => {
-		curLO2State = state;
-	} );
+	Promise.all( [ lo2.getFreq(), lo2.getPower(), lo2.getState() ] ).then( ( result ) => {
+		curLO2Freq = result[0];
+		curLO2Power = result[1];
+		curLO2State = result[2];
+	} ); 
 
 	function setLO2Freq( freq ) {
 		lo2.setFreq( parseInt( freq ) ).then( ( freq ) => {
@@ -70,15 +62,15 @@ module.exports = function( io ) {
 
 	function setLO2Power( power ) {
 		lo2.setPower( parseInt( power ) ).then( ( power ) => {
-			curLO2Freq = power;
+			curLO2Power = power;
 			io.emit( 'lo2.power', power );
 		} );
 	}
 
-	function setLO2Power( power ) {
-		lo2.setPower( parseInt( power ) ).then( ( power ) => {
-			curLO2Freq = power;
-			io.emit( 'lo2.power', power );
+	function setLO2State( state ) {
+		lo2.setState( state ).then( ( state ) => {
+			curLO2State = state;
+			io.emit( 'lo2.state', state );
 		} );
 	}
 
